@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>資格試験対策クイズ Pro</title>
+    <title>危険物試験対策 Pro</title>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <style>
         body { font-family: -apple-system, sans-serif; background: #f0f2f5; padding: 20px; color: #333; }
         .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); max-width: 500px; margin: auto; }
         #q-number { color: #666; font-size: 0.9em; margin-bottom: 8px; }
-        .question { font-weight: bold; margin-bottom: 20px; font-size: 1.2em; line-height: 1.5; }
+        .question { font-weight: bold; margin-bottom: 20px; font-size: 1.1em; line-height: 1.6; white-space: pre-wrap; }
         .option { 
             display: block; width: 100%; padding: 15px; margin-bottom: 12px;
             border: 2px solid #eee; border-radius: 10px; text-align: left;
@@ -18,18 +18,15 @@
         }
         .option.correct-ans { background: #e8f5e9; border-color: #4caf50; color: #2e7d32; font-weight: bold; }
         .option.wrong-ans { background: #ffebee; border-color: #ef5350; color: #c62828; }
-        
         #result-text { margin-top: 20px; font-weight: bold; text-align: center; font-size: 1.2em; min-height: 1.5em; }
         .next-btn { 
             display: none; width: 100%; padding: 16px; background: #007aff; 
             color: white; border: none; border-radius: 10px; font-size: 1.1em; font-weight: bold; margin-top: 10px;
         }
-        
-        /* リザルト画面のスタイル */
         .summary { text-align: center; padding: 10px; }
         .summary h2 { color: #007aff; margin-bottom: 20px; }
         .score-box { font-size: 1.1em; line-height: 2; margin-bottom: 30px; }
-        .rate { font-size: 2em; color: #333; font-weight: bold; }
+        .rate { font-size: 2.5em; color: #333; font-weight: bold; }
         .retry-btn { width: 100%; padding: 16px; background: #34c759; color: white; border: none; border-radius: 10px; font-size: 1.1em; font-weight: bold; }
     </style>
 </head>
@@ -37,8 +34,8 @@
 
 <div class="card" id="main-card">
     <div id="quiz-screen">
-        <div id="q-number">準備中...</div>
-        <div class="question" id="question-text">読み込み中...</div>
+        <div id="q-number">読み込み中...</div>
+        <div class="question" id="question-text"></div>
         <div id="options-container"></div>
         <div id="result-text"></div>
         <button class="next-btn" id="next-btn" onclick="nextQuestion()">次の問題へ</button>
@@ -59,27 +56,37 @@
 </div>
 
 <script>
-    // 【問題追加エリア】
-    // 1つ目の選択肢 a[0] を常に正解にして追加してください。
     const rawData = [
         {
             q: "危険物の性状で妥当でないものはどれか？",
-            a: ["液体の危険物の比重は１より小さいが固体の危険物の比重は全て１より大きい", "同一の物質であっても形状および粒度によって危険物になるものとならないものがある", "不燃体の液体及び固体で酸素を分離し他の燃焼を助けるものがある", "危険物には単体、化合物および混合物の３種類がある", "多くの酸素を含んでおり、他から酸素の供給が無くても燃焼するものがある"],
+            a: [
+                "液体の危険物の比重は1より小さいが固体の危険物の比重は全て1より大きい", 
+                "同一の物質であっても形状および粒度によって危険物になるものとならないものがある", 
+                "不燃体の液体及び固体で酸素を分離し他の燃焼を助けるものがある", 
+                "危険物には単体、化合物および混合物の3種類がある", 
+                "多くの酸素を含んでおり、他から酸素の供給が無くても燃焼するものがある"
+            ],
         },
         {
-            q: "類ごとに共通する性状について妥当なものはいくつあるか　　　　　　　　　第２類はいずれも着火または引火の危険のある固体である　　　　　　　　　第３類はいずれも酸素を自ら含んでいる自然発火性の物質である　　　　　　　　　第４類はいずれも比重が１より大きく、酸素を含んでいる物質である　　　　　　　　　第５類はいずれも可燃性の固体で加熱、衝撃、摩擦等で発火し爆発する　　　　　　　　　第６類はいずれも不燃性の液体で、多くは腐食性があり皮膚を侵す",
-            a: ["２つ", "１つ", "３つ", "４つ", "５つ"],
+            q: "類ごとに共通する性状について妥当なものはいくつあるか\n\n・第2類はいずれも着火または引火の危険のある固体である\n・第3類はいずれも酸素を自ら含んでいる自然発火性の物質である\n・第4類はいずれも比重が1より大きく、酸素を含んでいる物質である\n・第5類はいずれも可燃性の固体で加熱、衝撃、摩擦等で発火し爆発する\n・第6類はいずれも不燃性の液体で、多くは腐食性があり皮膚を侵す",
+            a: ["2つ", "1つ", "3つ", "4つ", "5つ"],
         },
         {
             q: "類ごとの性状として妥当でないものの組み合わせはどれか",
-            a: ["第１類と第４類は可燃性、第３類と第６類は比重が１より大きい", "第１類と第４類は可燃性、第３類と第５類の中には液体のものがある", "第３類と第６類は比重が１より大きい、第１類と第６類は酸化性物質", "第３類と第５類には液体もある、第４類と第５類は状態により自然発火のものある", "第４類と第５類は状態により自然発火のものある、第１類と第６類は酸化性物質"],
+            a: [
+                "第1類と第4類は可燃性、第3類と第6類は比重が1より大きい", 
+                "第1類と第4類は可燃性、第3類と第5類の中には液体のものがある", 
+                "第3類と第6類は比重が1より大きい、第1類と第6類は酸化性物質", 
+                "第3類と第5類には液体もある、第4類と第5類は状態により自然発火のものある", 
+                "第4類と第5類は状態により自然発火のものある、第1類と第6類は酸化性物質"
+            ],
         }
     ];
 
     let quizSet = [];
     let currentIdx = 0;
     let isAnswered = false;
-    let correctAnswersTotal = 0; // 正解数をカウントする変数
+    let correctAnswersTotal = 0;
 
     const shuffle = (array) => {
         for (let i = array.length - 1; i > 0; i--) {
@@ -135,7 +142,7 @@
         });
 
         if (selectedText === correctText) {
-            correctAnswersTotal++; // 正解したときにカウント
+            correctAnswersTotal++;
             resDiv.innerText = "⭕ 正解！";
             resDiv.style.color = "#2e7d32";
         } else {
@@ -159,9 +166,7 @@
     function showResult() {
         document.getElementById('quiz-screen').style.display = 'none';
         document.getElementById('result-screen').style.display = 'block';
-        
         const rate = Math.round((correctAnswersTotal / quizSet.length) * 100);
-        
         document.getElementById('total-q').innerText = quizSet.length;
         document.getElementById('correct-count').innerText = correctAnswersTotal;
         document.getElementById('correct-rate').innerText = rate;
@@ -171,5 +176,3 @@
 </script>
 </body>
 </html>
-
-
