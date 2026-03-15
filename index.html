@@ -12,12 +12,13 @@
         .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
         #q-number { color: #666; font-size: 0.9em; }
         
-        /* コピーボタンのスタイル */
+        /* コピーボタン */
         .copy-btn { 
-            background: #e1e1e1; color: #333; border: none; padding: 5px 10px; 
-            border-radius: 5px; font-size: 0.8em; cursor: pointer; transition: 0.2s;
+            background: #007aff; color: white; border: none; padding: 6px 12px; 
+            border-radius: 8px; font-size: 0.8em; cursor: pointer; transition: 0.2s;
+            font-weight: bold;
         }
-        .copy-btn:active { background: #ccc; }
+        .copy-btn:active { opacity: 0.7; }
 
         .question { font-weight: bold; margin-bottom: 20px; font-size: 1.1em; line-height: 1.6; white-space: pre-wrap; }
         .option { 
@@ -30,13 +31,13 @@
         
         #result-text { margin-top: 20px; font-weight: bold; text-align: center; font-size: 1.2em; min-height: 1.5em; }
         .next-btn { 
-            display: none; width: 100%; padding: 16px; background: #007aff; 
+            display: none; width: 100%; padding: 16px; background: #34c759; 
             color: white; border: none; border-radius: 10px; font-size: 1.1em; font-weight: bold; margin-top: 10px;
         }
         
         .summary { text-align: center; padding: 10px; }
         .rate { font-size: 2.5em; color: #333; font-weight: bold; }
-        .retry-btn { width: 100%; padding: 16px; background: #34c759; color: white; border: none; border-radius: 10px; font-size: 1.1em; font-weight: bold; }
+        .retry-btn { width: 100%; padding: 16px; background: #007aff; color: white; border: none; border-radius: 10px; font-size: 1.1em; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -45,7 +46,7 @@
     <div id="quiz-screen">
         <div class="header-row">
             <div id="q-number">準備中...</div>
-            <button class="copy-btn" onclick="copyQuestion()">問題をコピー</button>
+            <button class="copy-btn" onclick="copyEverything()">AI質問用にコピー</button>
         </div>
         <div class="question" id="question-text">読み込み中...</div>
         <div id="options-container"></div>
@@ -64,7 +65,6 @@
 </div>
 
 <script>
-    // 【問題追加エリア】
     const rawData = [
  {
             q: "第１類から第６類の危険物の性状で妥当でないものはどれか？",
@@ -930,7 +930,6 @@
             q: "五フッ化臭素の貯蔵、取扱いに関する次のA～Dについて正誤の組合せが妥当なものはどれか\n\nA.金属容器を避け、ガラス容器で貯蔵する\nB.冷暗所で貯蔵する\nC.空気に触れないように水中で貯蔵する\nD.発生した蒸気は吸引しないようにする",
             a: ["A.×、B.○、C.×、D.○", "A.×、B.○、C.○、D.×", "A.○、B.○、C.×、D.○", "A.○、B.×、C.○、D.×", "A.×、B.×、C.○、D.○"],
          }
-        // ここにさらに追加...
     ];
 
     let quizSet = [];
@@ -964,26 +963,32 @@
         container.innerHTML = '';
         document.getElementById('result-text').innerText = '';
         document.getElementById('next-btn').style.display = 'none';
-        const correctAnswerText = data.a[0];
         const shuffledOptions = shuffle([...data.a]);
         shuffledOptions.forEach((text) => {
             const btn = document.createElement('button');
             btn.className = 'option';
             btn.innerText = text;
-            btn.onclick = () => checkAnswer(btn, text, correctAnswerText);
+            btn.onclick = () => checkAnswer(btn, text, data.a[0]);
             container.appendChild(btn);
         });
     }
 
-    // ★コピー機能の追加
-    function copyQuestion() {
+    // ★問題と選択肢をすべてコピーする機能
+    function copyEverything() {
         const qText = document.getElementById('question-text').innerText;
-        const promptText = `以下の問題を詳しく解説してください。\n\n${qText}`;
+        const options = Array.from(document.querySelectorAll('.option')).map((btn, i) => `${i + 1}. ${btn.innerText}`).join('\n');
         
-        navigator.clipboard.writeText(promptText).then(() => {
+        const fullPrompt = `以下の問題を詳しく解説してください。\n\n【問題】\n${qText}\n\n【選択肢】\n${options}`;
+        
+        navigator.clipboard.writeText(fullPrompt).then(() => {
             const btn = document.querySelector('.copy-btn');
+            const originalText = btn.innerText;
             btn.innerText = 'コピー完了！';
-            setTimeout(() => { btn.innerText = '問題をコピー'; }, 2000);
+            btn.style.background = '#34c759';
+            setTimeout(() => { 
+                btn.innerText = originalText; 
+                btn.style.background = '#007aff';
+            }, 2000);
         }).catch(err => {
             alert('コピーに失敗しました');
         });
