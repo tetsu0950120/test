@@ -3,41 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>資格試験対策クイズ Pro</title>
+    <title>資格試験対策クイズ Pro+</title>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <style>
         body { font-family: -apple-system, sans-serif; background: #f0f2f5; padding: 20px; color: #333; }
         .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); max-width: 500px; margin: auto; }
         .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-        #q-number { color: #666; font-size: 0.9em; }
+        #q-number { color: #666; font-size: 0.8em; }
         
-        /* コピーボタン */
-        .copy-btn { 
-            background: #007aff; color: white; border: none; padding: 6px 12px; 
-            border-radius: 8px; font-size: 0.8em; cursor: pointer; transition: 0.2s;
-            font-weight: bold;
-        }
-        .copy-btn:active { opacity: 0.7; }
-
+        .copy-btn { background: #007aff; color: white; border: none; padding: 6px 12px; border-radius: 8px; font-size: 0.8em; cursor: pointer; font-weight: bold; }
         .question { font-weight: bold; margin-bottom: 20px; font-size: 1.1em; line-height: 1.6; white-space: pre-wrap; }
-        .option { 
-            display: block; width: 100%; padding: 15px; margin-bottom: 12px;
-            border: 2px solid #eee; border-radius: 10px; text-align: left;
-            background: white; cursor: pointer; font-size: 1em; transition: 0.2s;
-        }
+        .option { display: block; width: 100%; padding: 15px; margin-bottom: 12px; border: 2px solid #eee; border-radius: 10px; text-align: left; background: white; font-size: 1em; }
         .option.correct-ans { background: #e8f5e9; border-color: #4caf50; color: #2e7d32; font-weight: bold; }
         .option.wrong-ans { background: #ffebee; border-color: #ef5350; color: #c62828; }
         
-        #result-text { margin-top: 20px; font-weight: bold; text-align: center; font-size: 1.2em; min-height: 1.5em; }
-        .next-btn { 
-            display: none; width: 100%; padding: 16px; background: #34c759; 
-            color: white; border: none; border-radius: 10px; font-size: 1.1em; font-weight: bold; margin-top: 10px;
-        }
+        #result-text { margin-top: 15px; font-weight: bold; text-align: center; font-size: 1.2em; min-height: 1.5em; }
+        .footer-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+        .next-btn { display: none; padding: 16px; background: #34c759; color: white; border: none; border-radius: 10px; font-size: 1em; font-weight: bold; }
+        .quit-btn { display: none; padding: 16px; background: #8e8e93; color: white; border: none; border-radius: 10px; font-size: 1em; font-weight: bold; }
         
         .summary { text-align: center; padding: 10px; }
-        .rate { font-size: 2.5em; color: #333; font-weight: bold; }
-        .retry-btn { width: 100%; padding: 16px; background: #007aff; color: white; border: none; border-radius: 10px; font-size: 1.1em; font-weight: bold; }
+        .rate { font-size: 2.5em; color: #333; font-weight: bold; margin: 10px 0; }
+        .mode-title { color: #ff3b30; font-weight: bold; margin-bottom: 10px; }
+        .retry-btn { width: 100%; padding: 16px; background: #007aff; color: white; border: none; border-radius: 10px; font-size: 1em; font-weight: bold; margin-bottom: 10px; }
+        .review-btn { width: 100%; padding: 16px; background: #ff9500; color: white; border: none; border-radius: 10px; font-size: 1em; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -51,15 +41,24 @@
         <div class="question" id="question-text">読み込み中...</div>
         <div id="options-container"></div>
         <div id="result-text"></div>
-        <button class="next-btn" id="next-btn" onclick="nextQuestion()">次の問題へ</button>
+        <div class="footer-btns">
+            <button class="quit-btn" id="quit-btn" onclick="showResult(true)">中断して終了</button>
+            <button class="next-btn" id="next-btn" onclick="nextQuestion()">次の問題へ</button>
+        </div>
     </div>
     
     <div id="result-screen" style="display:none;">
         <div class="summary">
-            <h2>結果発表</h2>
+            <h2 id="result-title">結果発表</h2>
+            <div id="mode-notice" class="mode-title" style="display:none;">【復習モード】</div>
             <div class="rate"><span id="correct-rate">0</span>%</div>
-            <p>解答数: <span id="total-q">0</span> 問 / 正解数: <span id="correct-count">0</span> 問</p>
-            <button class="retry-btn" onclick="initQuiz()">もう一度解く</button>
+            <p><span id="answered-count">0</span>問中、<span id="correct-count">0</span>問正解</p>
+            <div id="review-area" style="display:none; margin-top:20px;">
+                <p>間違えた問題が <span id="wrong-count">0</span> 問あります</p>
+                <button class="review-btn" onclick="startReview()">間違えた問題だけ解く</button>
+            </div>
+            <hr style="margin:20px 0; border:0; border-top:1px solid #eee;">
+            <button class="retry-btn" onclick="initQuiz()">最初から解き直す</button>
         </div>
     </div>
 </div>
@@ -933,9 +932,11 @@
     ];
 
     let quizSet = [];
+    let wrongQuestions = []; // 間違えた問題を保存する配列
     let currentIdx = 0;
     let isAnswered = false;
-    let correctAnswersTotal = 0;
+    let correctCount = 0;
+    let isReviewMode = false;
 
     const shuffle = (array) => {
         for (let i = array.length - 1; i > 0; i--) {
@@ -947,22 +948,39 @@
 
     function initQuiz() {
         quizSet = shuffle([...rawData]);
+        wrongQuestions = [];
+        correctCount = 0;
+        isReviewMode = false;
+        startCommon();
+    }
+
+    function startReview() {
+        quizSet = shuffle([...wrongQuestions]);
+        wrongQuestions = [];
+        correctCount = 0;
+        isReviewMode = true;
+        startCommon();
+    }
+
+    function startCommon() {
         currentIdx = 0;
-        correctAnswersTotal = 0;
         document.getElementById('quiz-screen').style.display = 'block';
         document.getElementById('result-screen').style.display = 'none';
+        document.getElementById('mode-notice').style.display = isReviewMode ? 'block' : 'none';
         loadQuestion();
     }
 
     function loadQuestion() {
         isAnswered = false;
         const data = quizSet[currentIdx];
-        document.getElementById('q-number').innerText = `問題 ${currentIdx + 1} / ${quizSet.length}`;
+        document.getElementById('q-number').innerText = (isReviewMode ? "復習 " : "問題 ") + `${currentIdx + 1} / ${quizSet.length}`;
         document.getElementById('question-text').innerText = data.q;
         const container = document.getElementById('options-container');
         container.innerHTML = '';
         document.getElementById('result-text').innerText = '';
         document.getElementById('next-btn').style.display = 'none';
+        document.getElementById('quit-btn').style.display = 'none';
+
         const shuffledOptions = shuffle([...data.a]);
         shuffledOptions.forEach((text) => {
             const btn = document.createElement('button');
@@ -973,57 +991,65 @@
         });
     }
 
-    // ★問題と選択肢をすべてコピーする機能
-    function copyEverything() {
-        const qText = document.getElementById('question-text').innerText;
-        const options = Array.from(document.querySelectorAll('.option')).map((btn, i) => `${i + 1}. ${btn.innerText}`).join('\n');
-        
-        const fullPrompt = `以下の問題を詳しく解説してください。\n\n【問題】\n${qText}\n\n【選択肢】\n${options}`;
-        
-        navigator.clipboard.writeText(fullPrompt).then(() => {
-            const btn = document.querySelector('.copy-btn');
-            const originalText = btn.innerText;
-            btn.innerText = 'コピー完了！';
-            btn.style.background = '#34c759';
-            setTimeout(() => { 
-                btn.innerText = originalText; 
-                btn.style.background = '#007aff';
-            }, 2000);
-        }).catch(err => {
-            alert('コピーに失敗しました');
-        });
-    }
-
     function checkAnswer(selectedBtn, selectedText, correctText) {
         if (isAnswered) return;
         isAnswered = true;
         const allButtons = document.querySelectorAll('.option');
         allButtons.forEach(btn => { if (btn.innerText === correctText) btn.classList.add('correct-ans'); });
+        
         if (selectedText === correctText) {
-            correctAnswersTotal++;
+            correctCount++;
             document.getElementById('result-text').innerText = "⭕ 正解！";
             document.getElementById('result-text').style.color = "#2e7d32";
         } else {
             selectedBtn.classList.add('wrong-ans');
             document.getElementById('result-text').innerText = "❌ 不正解";
             document.getElementById('result-text').style.color = "#c62828";
+            wrongQuestions.push(quizSet[currentIdx]); // 間違えた問題を保存
         }
         document.getElementById('next-btn').style.display = 'block';
+        document.getElementById('quit-btn').style.display = 'block';
     }
 
     function nextQuestion() {
         currentIdx++;
         if (currentIdx < quizSet.length) { loadQuestion(); } 
-        else { showResult(); }
+        else { showResult(false); }
     }
 
-    function showResult() {
+    function showResult(isInterrupted) {
         document.getElementById('quiz-screen').style.display = 'none';
         document.getElementById('result-screen').style.display = 'block';
-        const rate = Math.round((correctAnswersTotal / quizSet.length) * 100);
-        document.getElementById('total-q').innerText = quizSet.length;
-        document.getElementById('correct-count').innerText = correctAnswersTotal;
+        
+        document.getElementById('result-title').innerText = isInterrupted ? "中断スコア" : "結果発表";
+        
+        const answeredSoFar = isAnswered ? currentIdx + 1 : currentIdx;
+        const rate = answeredSoFar > 0 ? Math.round((correctCount / answeredSoFar) * 100) : 0;
+        
         document.getElementById('correct-rate').innerText = rate;
+        document.getElementById('answered-count').innerText = answeredSoFar;
+        document.getElementById('correct-count').innerText = correctCount;
+        
+        // 復習ボタンの表示制御
+        const reviewArea = document.getElementById('review-area');
+        if (wrongQuestions.length > 0) {
+            reviewArea.style.display = 'block';
+            document.getElementById('wrong-count').innerText = wrongQuestions.length;
+        } else {
+            reviewArea.style.display = 'none';
+        }
+    }
+
+    function copyEverything() {
+        const qText = document.getElementById('question-text').innerText;
+        const options = Array.from(document.querySelectorAll('.option')).map((btn, i) => `${i + 1}. ${btn.innerText}`).join('\n');
+        const fullPrompt = `以下の問題を詳しく解説してください。\n\n【問題】\n${qText}\n\n【選択肢】\n${options}`;
+        navigator.clipboard.writeText(fullPrompt).then(() => {
+            const btn = document.querySelector('.copy-btn');
+            const originalText = btn.innerText;
+            btn.innerText = '完了！';
+            setTimeout(() => { btn.innerText = originalText; }, 2000);
+        });
     }
 
     initQuiz();
