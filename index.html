@@ -7,7 +7,26 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <style>
-        body { font-family: -apple-system, sans-serif; background: #f0f2f5; padding: 20px; color: #333; }
+        body { font-family: -apple-system, sans-serif; background: #f0f2f5; padding: 20px; color: #333; margin-top: 60px; }
+        
+        /* 常に表示されるステータスバー */
+        .status-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: #fff;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            z-index: 1000;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .status-item { text-align: center; font-size: 0.9em; }
+        .status-value { color: #007aff; font-size: 1.1em; display: block; }
+
         .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); max-width: 500px; margin: auto; }
         .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
         #q-number { color: #666; font-size: 0.8em; }
@@ -31,6 +50,12 @@
     </style>
 </head>
 <body>
+
+<div class="status-bar" id="live-status-bar">
+    <div class="status-item">進捗<span id="live-progress" class="status-value">0 / 0</span></div>
+    <div class="status-item">正解数<span id="live-correct" class="status-value">0</span></div>
+    <div class="status-item">正答率<span id="live-rate" class="status-value">0%</span></div>
+</div>
 
 <div class="card" id="main-card">
     <div id="quiz-screen">
@@ -539,7 +564,7 @@
          },
  {
             q: "鉄粉の性状等について、次のうち妥当でないものはどれか",
-            a: ["アルミニウム粉より融点が低い", "目開きが53㎛の網ふるいを通過するものが60wt％のものは法令上の危険物に該当する", "貯蔵は湿気を避け容器は密栓する", "微粉状態では小さな火源でも爆発することがある", "硝酸、過ギ酸と混ざると発火することがある"],
+            a: ["アルミニウム粉より融点が低い", "目開きが53?の網ふるいを通過するものが60wt％のものは法令上の危険物に該当する", "貯蔵は湿気を避け容器は密栓する", "微粉状態では小さな火源でも爆発することがある", "硝酸、過ギ酸と混ざると発火することがある"],
          },
  {
             q: "金属粉（アルミニウム、亜鉛）の消火方法として次のうち最も妥当なものはどれか",
@@ -890,19 +915,19 @@
             a: ["常温では無色の液体である", "水と反応しない", "空気中で自然発火する", "還元されにくい", "不安定で、引火性かつ爆発性の物質である"],
          },
  {
-            q: "五フッ化要素の性状について次のA～Eのうち妥当なものの組合せはどれか\n\nA.強い刺激臭がある発煙性の褐色液体である\nB.空気中で激しく発煙し、酸または酸性蒸気に触れるとフッ化水素その他の化合物を生じる\nC.ガラスは侵さない\nD.水と激しく反応し、猛毒のフッ化水素とヨウ素酸を生じる\nE.金属と容易に反応しフッ化物を作るが、非金属とは反応しない",
+            q: "五フッ化ヨウ素の性状について次のA～Eのうち妥当なものの組合せはどれか\n\nA.強い刺激臭がある発煙性の褐色液体である\nB.空気中で激しく発煙し、酸または酸性蒸気に触れるとフッ化水素その他の化合物を生じる\nC.ガラスは侵さない\nD.水と激しく反応し、猛毒のフッ化水素とヨウ素酸を生じる\nE.金属と容易に反応しフッ化物を作るが、非金属とは反応しない",
             a: ["BとD", "AとC", "AとE", "BとE", "CとD"],
          },
  {
-            q: "五フッ化要素の性状について次のA～Eのうち妥当なものを組み合わせたものはどれか\n\nA.常温で褐色の液体である\nB.空気中で発生する気体は無臭である\nC.皮膚に触れると薬傷を起こす\nD.有機物、硫黄、金属微粉と接触すると発火する恐れがある\nE.不安定で爆発しやすい",
+            q: "五フッ化ヨウ素の性状について次のA～Eのうち妥当なものを組み合わせたものはどれか\n\nA.常温で褐色の液体である\nB.空気中で発生する気体は無臭である\nC.皮膚に触れると薬傷を起こす\nD.有機物、硫黄、金属微粉と接触すると発火する恐れがある\nE.不安定で爆発しやすい",
             a: ["CとD", "AとB", "AとE", "BとC", "DとE"],
          },
  {
-            q: "五フッ化要素の性状について次のうち妥当でないものはどれか",
+            q: "五フッ化ヨウ素の性状について次のうち妥当でないものはどれか",
             a: ["強酸で腐食性が強いためガラス容器が適している", "反応性に富み、金属と容易に反応してフッ化物を作る", "常温では液体である", "硫黄、赤リンなどと光を放って反応する", "水とは激しく反応してフッ化水素を生じる"],
          },
  {
-            q: "五フッ化要素の性状について次のうち妥当でないものはどれか",
+            q: "五フッ化ヨウ素の性状について次のうち妥当でないものはどれか",
             a: ["多くの金属と反応することからガラス容器に貯蔵する", "常温では無色の液体である", "水と反応してフッ化水素を生じる", "約10℃の低温で固化し、白色となる", "可燃物と接触し火災となった場合は保護服及び呼吸保護器具を着用して消化する"],
          },
  {
@@ -932,10 +957,11 @@
     ];
 
     let quizSet = [];
-    let wrongQuestions = []; // 間違えた問題を保存する配列
+    let wrongQuestions = [];
     let currentIdx = 0;
     let isAnswered = false;
     let correctCount = 0;
+    let answeredCount = 0; // 解答済みの数（リアルタイム計算用）
     let isReviewMode = false;
 
     const shuffle = (array) => {
@@ -946,10 +972,18 @@
         return array;
     };
 
+    function updateLiveStatus() {
+        document.getElementById('live-progress').innerText = `${currentIdx + 1} / ${quizSet.length}`;
+        document.getElementById('live-correct').innerText = correctCount;
+        const rate = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+        document.getElementById('live-rate').innerText = `${rate}%`;
+    }
+
     function initQuiz() {
         quizSet = shuffle([...rawData]);
         wrongQuestions = [];
         correctCount = 0;
+        answeredCount = 0;
         isReviewMode = false;
         startCommon();
     }
@@ -958,6 +992,7 @@
         quizSet = shuffle([...wrongQuestions]);
         wrongQuestions = [];
         correctCount = 0;
+        answeredCount = 0;
         isReviewMode = true;
         startCommon();
     }
@@ -966,6 +1001,7 @@
         currentIdx = 0;
         document.getElementById('quiz-screen').style.display = 'block';
         document.getElementById('result-screen').style.display = 'none';
+        document.getElementById('live-status-bar').style.display = 'flex';
         document.getElementById('mode-notice').style.display = isReviewMode ? 'block' : 'none';
         loadQuestion();
     }
@@ -981,6 +1017,8 @@
         document.getElementById('next-btn').style.display = 'none';
         document.getElementById('quit-btn').style.display = 'none';
 
+        updateLiveStatus();
+
         const shuffledOptions = shuffle([...data.a]);
         shuffledOptions.forEach((text) => {
             const btn = document.createElement('button');
@@ -994,19 +1032,22 @@
     function checkAnswer(selectedBtn, selectedText, correctText) {
         if (isAnswered) return;
         isAnswered = true;
+        answeredCount++;
         const allButtons = document.querySelectorAll('.option');
         allButtons.forEach(btn => { if (btn.innerText === correctText) btn.classList.add('correct-ans'); });
         
         if (selectedText === correctText) {
             correctCount++;
-            document.getElementById('result-text').innerText = "⭕ 正解！";
+            document.getElementById('result-text').innerText = "? 正解！";
             document.getElementById('result-text').style.color = "#2e7d32";
         } else {
             selectedBtn.classList.add('wrong-ans');
-            document.getElementById('result-text').innerText = "❌ 不正解";
+            document.getElementById('result-text').innerText = "? 不正解";
             document.getElementById('result-text').style.color = "#c62828";
-            wrongQuestions.push(quizSet[currentIdx]); // 間違えた問題を保存
+            wrongQuestions.push(quizSet[currentIdx]);
         }
+        
+        updateLiveStatus(); // 解答直後に数値を更新
         document.getElementById('next-btn').style.display = 'block';
         document.getElementById('quit-btn').style.display = 'block';
     }
@@ -1019,18 +1060,17 @@
 
     function showResult(isInterrupted) {
         document.getElementById('quiz-screen').style.display = 'none';
+        document.getElementById('live-status-bar').style.display = 'none'; // 結果画面ではバーを隠す
         document.getElementById('result-screen').style.display = 'block';
         
         document.getElementById('result-title').innerText = isInterrupted ? "中断スコア" : "結果発表";
         
-        const answeredSoFar = isAnswered ? currentIdx + 1 : currentIdx;
-        const rate = answeredSoFar > 0 ? Math.round((correctCount / answeredSoFar) * 100) : 0;
+        const rate = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
         
         document.getElementById('correct-rate').innerText = rate;
-        document.getElementById('answered-count').innerText = answeredSoFar;
+        document.getElementById('answered-count').innerText = answeredCount;
         document.getElementById('correct-count').innerText = correctCount;
         
-        // 復習ボタンの表示制御
         const reviewArea = document.getElementById('review-area');
         if (wrongQuestions.length > 0) {
             reviewArea.style.display = 'block';
@@ -1040,18 +1080,24 @@
         }
     }
 
-    function copyEverything() {
+function copyEverything() {
+        const btn = document.querySelector('.copy-btn');
+        const originalText = btn.innerText; // ここで現在のテキスト（AI質問用にコピー）を保存
+        
         const qText = document.getElementById('question-text').innerText;
         const options = Array.from(document.querySelectorAll('.option')).map((btn, i) => `${i + 1}. ${btn.innerText}`).join('\n');
         const fullPrompt = `以下の問題を詳しく解説してください。\n\n【問題】\n${qText}\n\n【選択肢】\n${options}`;
+        
         navigator.clipboard.writeText(fullPrompt).then(() => {
-            const btn = document.querySelector('.copy-btn');
-            const originalText = btn.innerText;
             btn.innerText = '完了！';
-            setTimeout(() => { btn.innerText = originalText; }, 2000);
+            // 2秒後に元のテキストに戻す
+            setTimeout(() => { 
+                btn.innerText = originalText; 
+            }, 2000);
+        }).catch(err => {
+            console.error('コピーに失敗しました', err);
         });
     }
-
     initQuiz();
 </script>
 </body>
