@@ -1038,11 +1038,11 @@
         
         if (selectedText === correctText) {
             correctCount++;
-            document.getElementById('result-text').innerText = "? 正解！";
+            document.getElementById('result-text').innerText = "⭕ 正解！";
             document.getElementById('result-text').style.color = "#2e7d32";
         } else {
             selectedBtn.classList.add('wrong-ans');
-            document.getElementById('result-text').innerText = "? 不正解";
+            document.getElementById('result-text').innerText = "❌ 不正解";
             document.getElementById('result-text').style.color = "#c62828";
             wrongQuestions.push(quizSet[currentIdx]);
         }
